@@ -10,11 +10,18 @@ the color palette and simplicity are goals here as well. :3
 3. run `cargo build --release`
 4. enjoy your `bevy-draw.exe` found inside of `build/release`
 
+## TODO
+- [ ] pen smoothing
+- [ ] eraser
+- [ ] undo
+- [ ] saving to .png
+
 ## Features i want but have no clue how to implement
 - [ ] pen pressure
-- [ ] nightshade
+- [ ] <!-- I fuckin hate PDFs -->PDF support
 - [ ] garlic bread
 - [ ] dragon-inator
+- [ ] plushsuit
 
 <!-- Thanks for looking at the comments -->
 <!-- Gay Gay Homosexual Gay -->
