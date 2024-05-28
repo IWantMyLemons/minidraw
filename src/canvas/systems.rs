@@ -91,10 +91,15 @@ pub fn move_camera(
 }
 
 pub fn zoom_camera(
+    window: Query<&Window, With<PrimaryWindow>>,
     mut camera: Query<&mut Transform, With<Camera>>,
     mut scroll_reader: EventReader<MouseWheel>,
 ) {
-    guard!(Ok(mut transform) = camera.get_single_mut());
+    guard!(
+        Ok(mut transform) = camera.get_single_mut(),
+        Ok(window) = window.get_single(),
+        Some(cursor_pos) = window.cursor_position(),
+    );
 
     for scroll in scroll_reader.read() {
         let distance = match scroll.unit {
@@ -102,7 +107,12 @@ pub fn zoom_camera(
             MouseScrollUnit::Pixel => -scroll.y * SCROLL_PIXEL_SCALE,
         };
 
+        let delta = cursor_pos - Vec2::new(window.width(), window.height()) / 2.0;
+        let old_scale = transform.scale.x;
         transform.scale *= 10.0f32.powf(distance);
+        let new_scale = transform.scale.x;
+
+        transform.translation += Vec3::new(-delta.x, delta.y, 0.0) * (new_scale - old_scale);
     }
 }
 
