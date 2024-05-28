@@ -66,9 +66,11 @@ pub fn move_camera(
     mouse: Res<ButtonInput<MouseButton>>,
     mut last_clicked: ResMut<LastClicked>,
 ) {
-    guard!(Ok(mut transform) = camera.get_single_mut(),
+    guard!(
+        Ok(mut transform) = camera.get_single_mut(),
         Ok(window) = window.get_single(),
-        Some(cursor_pos) = window.cursor_position(),);
+        Some(cursor_pos) = window.cursor_position(),
+    );
 
     if (keyboard.pressed(KeyCode::Space) && mouse.just_pressed(MouseButton::Left))
         || (keyboard.just_pressed(KeyCode::Space) && mouse.pressed(MouseButton::Left))
