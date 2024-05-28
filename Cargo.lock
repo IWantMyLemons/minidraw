@@ -248,14 +248,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bevy-draw"
-version = "0.1.0"
-dependencies = [
- "bevy",
- "guard_macros",
-]
-
-[[package]]
 name = "bevy_a11y"
 version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1772,6 +1764,14 @@ dependencies = [
  "log",
  "objc",
  "paste",
+]
+
+[[package]]
+name = "minidraw"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "guard_macros",
 ]
 
 [[package]]
