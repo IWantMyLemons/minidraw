@@ -9,6 +9,12 @@ use systems::{clear_canvas, draw_line, move_camera, zoom_camera};
 const SCROLL_LINE_SCALE: f32 = 0.5;
 const SCROLL_PIXEL_SCALE: f32 = 1.0;
 
+const PEN_SPACING: f32 = 0.5;
+const PEN_THICKNESS: f32 = 2.5;
+const PEN_COLOR: Color = Color::hsl(0.0, 0.8, 0.7);
+
+const ZOOM_BASE: f32 = 2.0;
+
 pub struct CanvasPlugin;
 
 impl Plugin for CanvasPlugin {

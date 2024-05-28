@@ -28,7 +28,7 @@ pub fn draw_line(
         Ok((camera, camera_transform)) = camera.get_single(),
         Some(cursor_pos) = window.cursor_position(),
         Some(global_cursor_pos) = camera.viewport_to_world_2d(camera_transform, cursor_pos),
-        last_pos.0.distance(global_cursor_pos) > 2.0,
+        last_pos.0.distance(global_cursor_pos) > PEN_SPACING,
     );
     // If this is the first point, set prev to curr, this prevents the line from teleporting
     if mouse.just_pressed(MouseButton::Left) {
@@ -40,8 +40,8 @@ pub fn draw_line(
     let delta = global_cursor_pos - last_pos.0;
     commands.spawn((
         MaterialMesh2dBundle {
-            mesh: Mesh2dHandle(meshes.add(Capsule2d::new(4.0, delta.length()))),
-            material: materials.add(Color::hsl(0.0, 0.8, 0.7)),
+            mesh: Mesh2dHandle(meshes.add(Capsule2d::new(PEN_THICKNESS, delta.length()))),
+            material: materials.add(PEN_COLOR),
             transform: Transform {
                 translation: Vec3 {
                     x: in_between.x,
@@ -109,7 +109,7 @@ pub fn zoom_camera(
 
         let delta = cursor_pos - Vec2::new(window.width(), window.height()) / 2.0;
         let old_scale = transform.scale.x;
-        transform.scale *= 10.0f32.powf(distance);
+        transform.scale *= ZOOM_BASE.powf(distance);
         let new_scale = transform.scale.x;
 
         transform.translation += Vec3::new(-delta.x, delta.y, 0.0) * (new_scale - old_scale);
