@@ -1,0 +1,24 @@
+[package]
+name = "bevy-draw"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# https://github.com/bevyengine/bevy/blob/main/docs/cargo_features.md
+bevy = { version = "0.13.2", default-features = false, features = [
+    "bevy_asset",         # Assets management
+    "bevy_core_pipeline", # Common rendering abstractions
+    "bevy_sprite",        # 2D (sprites) rendering
+    "dynamic_linking",    # Dynamic linking for faster compile-times
+    "multi-threaded",     # Run with multithreading
+    "bevy_winit",         # Window management (cross-platform Winit backend)
+] }
+guard_macros = "1.0.2"
+
+# Enable a small amount of optimization in debug mode
+[profile.dev]
+opt-level = 1
+
+# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
+[profile.dev.package."*"]
+opt-level = 3
