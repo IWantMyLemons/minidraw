@@ -1,10 +1,12 @@
 pub mod components;
-mod resources;
+pub mod events;
+pub mod resources;
 mod systems;
 
 use bevy::prelude::*;
+use events::DrawLineEvent;
 use resources::{LastClicked, LastPos};
-use systems::{clear_canvas, draw_line, move_camera, zoom_camera};
+use systems::{clear_canvas, draw_line, move_camera, rasterize_stroke, remove_stroke, zoom_camera};
 
 const SCROLL_LINE_SCALE: f32 = 0.5;
 const SCROLL_PIXEL_SCALE: f32 = 1.0;
@@ -21,6 +23,17 @@ impl Plugin for CanvasPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<LastPos>()
             .init_resource::<LastClicked>()
-            .add_systems(Update, (draw_line, clear_canvas, move_camera, zoom_camera));
+            .add_event::<DrawLineEvent>()
+            .add_systems(
+                Update,
+                (
+                    draw_line,
+                    clear_canvas,
+                    move_camera,
+                    zoom_camera,
+                    rasterize_stroke,
+                    remove_stroke.after(rasterize_stroke),
+                ),
+            );
     }
 }

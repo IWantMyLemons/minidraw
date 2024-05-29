@@ -13,6 +13,7 @@ bevy = { version = "0.13.2", default-features = false, features = [
     "multi-threaded",     # Run with multithreading
     "bevy_winit",         # Window management (cross-platform Winit backend)
 ] }
+bevy_prototype_lyon = "0.11.0"
 guard_macros = "1.0.2"
 imageproc = "0.25.0"
 

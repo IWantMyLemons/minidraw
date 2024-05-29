@@ -6,9 +6,10 @@ use bevy::{
     sprite::{MaterialMesh2dBundle, Mesh2dHandle},
     window::PrimaryWindow,
 };
+use bevy_prototype_lyon::prelude::*;
 use guard_macros::guard;
 
-use super::{components::*, resources::*, *};
+use super::{components::*, events::*, resources::*, *};
 
 #[allow(clippy::too_many_arguments)]
 pub fn draw_line(
@@ -20,9 +21,15 @@ pub fn draw_line(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut last_pos: ResMut<LastPos>,
+    mut draw_writer: EventWriter<DrawLineEvent>,
 ) {
+    guard!(!keyboard.pressed(KeyCode::Space));
+
+    if mouse.just_released(MouseButton::Left) {
+        draw_writer.send(DrawLineEvent);
+    }
+
     guard!(
-        !keyboard.pressed(KeyCode::Space),
         mouse.pressed(MouseButton::Left),
         Ok(window) = window.get_single(),
         Ok((camera, camera_transform)) = camera.get_single(),
@@ -35,10 +42,13 @@ pub fn draw_line(
         last_pos.0 = global_cursor_pos;
     }
 
+    commands.spawn(Point(global_cursor_pos));
+
     // Spawn the line
     let in_between = (global_cursor_pos + last_pos.0) / 2.0;
     let delta = global_cursor_pos - last_pos.0;
     commands.spawn((
+        Line,
         MaterialMesh2dBundle {
             mesh: Mesh2dHandle(meshes.add(Capsule2d::new(PEN_THICKNESS, delta.length()))),
             material: materials.add(PEN_COLOR),
@@ -53,7 +63,6 @@ pub fn draw_line(
             },
             ..default()
         },
-        Line,
     ));
 
     last_pos.0 = global_cursor_pos;
@@ -129,5 +138,39 @@ pub fn clear_canvas(
     }
     for entity in lines.iter() {
         commands.entity(entity).despawn();
+    }
+}
+
+pub fn rasterize_stroke(
+    mut commands: Commands,
+    mut draw_reader: EventReader<DrawLineEvent>,
+    points: Query<(Entity, &Point)>,
+) {
+    for _ in draw_reader.read() {
+        let mut path_builder = PathBuilder::new();
+
+        for (entity, point) in points.iter() {
+            path_builder.line_to(point.0);
+            commands.entity(entity).despawn();
+        }
+
+        let path = path_builder.build();
+
+        commands.spawn((
+            ShapeBundle { path, ..default() },
+            Stroke::new(Color::BLACK, 4.0),
+        ));
+    }
+}
+
+pub fn remove_stroke(
+    mut commands: Commands,
+    mut draw_reader: EventReader<DrawLineEvent>,
+    lines: Query<Entity, With<Line>>,
+) {
+    for _ in draw_reader.read() {
+        for entity in lines.iter() {
+            commands.entity(entity).despawn();
+        }
     }
 }
