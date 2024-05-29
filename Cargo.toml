@@ -12,6 +12,7 @@ bevy = { version = "0.13.2", default-features = false, features = [
     "dynamic_linking",    # Dynamic linking for faster compile-times
     "multi-threaded",     # Run with multithreading
     "bevy_winit",         # Window management (cross-platform Winit backend)
+    "x11",                # Linux: Support X11 windowing system
 ] }
 bevy_prototype_lyon = "0.11.0"
 guard_macros = "1.0.2"
