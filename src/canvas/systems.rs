@@ -158,7 +158,7 @@ pub fn rasterize_stroke(
 
         commands.spawn((
             ShapeBundle { path, ..default() },
-            Stroke::new(Color::BLACK, 4.0),
+            Stroke::new(PEN_COLOR, PEN_THICKNESS * 2.0),
         ));
     }
 }
