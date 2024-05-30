@@ -4,4 +4,7 @@ use bevy::prelude::*;
 pub struct Point(pub Vec2);
 
 #[derive(Component)]
+pub struct PenStroke;
+
+#[derive(Component)]
 pub struct Line;

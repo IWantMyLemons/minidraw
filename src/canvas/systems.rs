@@ -48,7 +48,7 @@ pub fn draw_line(
     let in_between = (global_cursor_pos + last_pos.0) / 2.0;
     let delta = global_cursor_pos - last_pos.0;
     commands.spawn((
-        Line,
+        PenStroke,
         MaterialMesh2dBundle {
             mesh: Mesh2dHandle(meshes.add(Capsule2d::new(PEN_THICKNESS, delta.length()))),
             material: materials.add(PEN_COLOR),
@@ -141,7 +141,7 @@ pub fn clear_canvas(
     }
 }
 
-pub fn rasterize_stroke(
+pub fn stroke_to_line(
     mut commands: Commands,
     mut draw_reader: EventReader<DrawLineEvent>,
     points: Query<(Entity, &Point)>,
@@ -157,19 +157,20 @@ pub fn rasterize_stroke(
         let path = path_builder.build();
 
         commands.spawn((
+            Line,
             ShapeBundle { path, ..default() },
             Stroke::new(PEN_COLOR, PEN_THICKNESS * 2.0),
         ));
     }
 }
 
-pub fn remove_stroke(
+pub fn remove_line(
     mut commands: Commands,
     mut draw_reader: EventReader<DrawLineEvent>,
-    lines: Query<Entity, With<Line>>,
+    strokes: Query<Entity, With<PenStroke>>,
 ) {
     for _ in draw_reader.read() {
-        for entity in lines.iter() {
+        for entity in strokes.iter() {
             commands.entity(entity).despawn();
         }
     }

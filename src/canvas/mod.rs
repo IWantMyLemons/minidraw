@@ -6,7 +6,7 @@ mod systems;
 use bevy::prelude::*;
 use events::DrawLineEvent;
 use resources::{LastClicked, LastPos};
-use systems::{clear_canvas, draw_line, move_camera, rasterize_stroke, remove_stroke, zoom_camera};
+use systems::{clear_canvas, draw_line, move_camera, remove_line, stroke_to_line, zoom_camera};
 
 const SCROLL_LINE_SCALE: f32 = 0.5;
 const SCROLL_PIXEL_SCALE: f32 = 1.0;
@@ -31,8 +31,8 @@ impl Plugin for CanvasPlugin {
                     clear_canvas,
                     move_camera,
                     zoom_camera,
-                    rasterize_stroke,
-                    remove_stroke.after(rasterize_stroke),
+                    stroke_to_line,
+                    remove_line,
                 ),
             );
     }
