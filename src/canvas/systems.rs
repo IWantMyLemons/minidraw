@@ -35,8 +35,10 @@ pub fn draw_line(
         Ok((camera, camera_transform)) = camera.get_single(),
         Some(cursor_pos) = window.cursor_position(),
         Some(global_cursor_pos) = camera.viewport_to_world_2d(camera_transform, cursor_pos),
-        last_pos.0.distance(global_cursor_pos) > PEN_SPACING,
+        last_pos.0.distance(global_cursor_pos)
+            > camera_transform.compute_transform().scale.x * PEN_SPACING,
     );
+
     // If this is the first point, set prev to curr, this prevents the line from teleporting
     if mouse.just_pressed(MouseButton::Left) {
         last_pos.0 = global_cursor_pos;
