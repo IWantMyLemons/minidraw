@@ -161,7 +161,7 @@ pub fn stroke_to_line(
         commands.spawn((
             Line,
             ShapeBundle { path, ..default() },
-            Stroke::new(PEN_COLOR, PEN_THICKNESS * 2.0),
+            get_stroke_settings(),
         ));
     }
 }
