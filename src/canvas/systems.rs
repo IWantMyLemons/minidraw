@@ -3,11 +3,17 @@ use std::f32::consts::PI;
 use bevy::{
     input::mouse::{MouseScrollUnit, MouseWheel},
     prelude::*,
+    render::render_resource::{
+        Extent3d, TextureDescriptor, TextureDimension, TextureFormat, TextureUsages,
+    },
     sprite::{MaterialMesh2dBundle, Mesh2dHandle},
     window::PrimaryWindow,
 };
+use bevy_image_export::{ImageExportBundle, ImageExportSettings, ImageExportSource};
 use bevy_prototype_lyon::prelude::*;
 use guard_macros::guard;
+
+use crate::components::CanvasCamera;
 
 use super::{components::*, events::*, resources::*, *};
 
@@ -15,7 +21,7 @@ use super::{components::*, events::*, resources::*, *};
 pub fn draw_line(
     mut commands: Commands,
     window: Query<&Window, With<PrimaryWindow>>,
-    camera: Query<(&Camera, &GlobalTransform)>,
+    camera: Query<(&Camera, &GlobalTransform), With<CanvasCamera>>,
     keyboard: Res<ButtonInput<KeyCode>>,
     mouse: Res<ButtonInput<MouseButton>>,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -71,7 +77,7 @@ pub fn draw_line(
 }
 
 pub fn move_camera(
-    mut camera: Query<&mut Transform, With<Camera>>,
+    mut camera: Query<&mut Transform, With<CanvasCamera>>,
     window: Query<&Window, With<PrimaryWindow>>,
     keyboard: Res<ButtonInput<KeyCode>>,
     mouse: Res<ButtonInput<MouseButton>>,
@@ -103,7 +109,7 @@ pub fn move_camera(
 
 pub fn zoom_camera(
     window: Query<&Window, With<PrimaryWindow>>,
-    mut camera: Query<&mut Transform, With<Camera>>,
+    mut camera: Query<&mut Transform, With<CanvasCamera>>,
     mut scroll_reader: EventReader<MouseWheel>,
 ) {
     guard!(
@@ -176,4 +182,73 @@ pub fn remove_line(
             commands.entity(entity).despawn();
         }
     }
+}
+
+pub fn make_empty_canvas(mut images: ResMut<Assets<Image>>, mut canvas: ResMut<CanvasHandle>) {
+    let size = Extent3d {
+        width: 2048,
+        height: 2048,
+        ..default()
+    };
+
+    // This is the texture that will be rendered to.
+    let mut image = Image {
+        texture_descriptor: TextureDescriptor {
+            label: None,
+            size,
+            dimension: TextureDimension::D2,
+            format: TextureFormat::Bgra8UnormSrgb,
+            mip_level_count: 1,
+            sample_count: 1,
+            usage: TextureUsages::TEXTURE_BINDING
+                | TextureUsages::COPY_DST
+                | TextureUsages::RENDER_ATTACHMENT,
+            view_formats: &[],
+        },
+        ..default()
+    };
+
+    // fill image.data with zeroes
+    image.resize(size);
+
+    let image_handle = images.add(image);
+
+    canvas.0 = image_handle;
+}
+
+pub fn spawn_render_camera(mut commands: Commands, canvas: Res<CanvasHandle>) {
+    commands.spawn((
+        RenderCamera,
+        Camera2dBundle {
+            camera: Camera {
+                order: -1,
+                target: canvas.0.clone().into(),
+                ..default()
+            },
+            ..default()
+        },
+    ));
+
+    // commands.spawn(SpriteBundle {
+    //     texture: canvas.0.clone(),
+    //     transform: Transform::from_translation(Vec3::new(1.0, 0.0, 0.0)),
+    //     ..default()
+    // });
+}
+
+pub fn save_file(
+    mut commands: Commands,
+    mut export_sources: ResMut<Assets<ImageExportSource>>,
+    image: Res<CanvasHandle>,
+    keyboard: Res<ButtonInput<KeyCode>>,
+) {
+    guard!(keyboard.pressed(KeyCode::ControlLeft) && keyboard.just_pressed(KeyCode::KeyS));
+
+    commands.spawn(ImageExportBundle {
+        source: export_sources.add(image.0.clone()),
+        settings: ImageExportSettings {
+            output_dir: "out".into(),
+            extension: "png".into(),
+        },
+    });
 }

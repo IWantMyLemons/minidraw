@@ -4,12 +4,14 @@ use bevy::{
     sprite::{MaterialMesh2dBundle, Mesh2dHandle},
 };
 
+use super::components::*;
+
 pub fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    commands.spawn(Camera2dBundle { ..default() });
+    commands.spawn((CanvasCamera, Camera2dBundle { ..default() }));
 
     commands.spawn(MaterialMesh2dBundle {
         mesh: Mesh2dHandle(meshes.add(Circle::new(2.0))),
@@ -21,6 +23,6 @@ pub fn setup(
 
 pub fn quit_app(mut exit_writer: EventWriter<AppExit>, keyboard: Res<ButtonInput<KeyCode>>) {
     if keyboard.pressed(KeyCode::ControlLeft) && keyboard.just_pressed(KeyCode::KeyQ) {
-        exit_writer.send(AppExit);
+        exit_writer.send(AppExit::Success);
     }
 }

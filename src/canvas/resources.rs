@@ -8,3 +8,6 @@ pub struct LastClicked {
     pub cursor: Vec2,
     pub camera: Vec3,
 }
+
+#[derive(Resource, Default)]
+pub struct CanvasHandle(pub Handle<Image>);

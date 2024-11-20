@@ -9,8 +9,8 @@ use bevy_prototype_lyon::{
     prelude::{LineCap, LineJoin},
 };
 use events::DrawLineEvent;
-use resources::{LastClicked, LastPos};
-use systems::{clear_canvas, draw_line, move_camera, remove_line, stroke_to_line, zoom_camera};
+use resources::{CanvasHandle, LastClicked, LastPos};
+use systems::*;
 
 const SCROLL_LINE_SCALE: f32 = 0.5;
 const SCROLL_PIXEL_SCALE: f32 = 1.0;
@@ -35,7 +35,15 @@ impl Plugin for CanvasPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<LastPos>()
             .init_resource::<LastClicked>()
+            .init_resource::<CanvasHandle>()
             .add_event::<DrawLineEvent>()
+            .add_systems(
+                Startup,
+                (
+                    make_empty_canvas,
+                    spawn_render_camera.after(make_empty_canvas),
+                ),
+            )
             .add_systems(
                 Update,
                 (
@@ -45,6 +53,7 @@ impl Plugin for CanvasPlugin {
                     zoom_camera,
                     stroke_to_line,
                     remove_line,
+                    save_file,
                 ),
             );
     }

@@ -8,3 +8,6 @@ pub struct PenStroke;
 
 #[derive(Component)]
 pub struct Line;
+
+#[derive(Component)]
+pub struct RenderCamera;
